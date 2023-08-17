@@ -21,9 +21,9 @@ app.use(cors(corsOptions));
 // const csrfProtection = csrf({ cookie: true });
 app.use(helmet())
 app.use((req, res, next) => {
-  if (req.secure) {
-    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-    }
+  // if (req.secure) {
+  //   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  //   }
   res.setHeader("X-Frame-Options", "SAMEORIGIN");
   res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;");
   res.setHeader('Allow', 'GET, POST');
