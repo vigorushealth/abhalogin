@@ -10,6 +10,7 @@ const router = require("./routes");
 dotenv.config();
 
 const app = express();
+app.use(cookieParser());
 const corsOptions = {
   origin: "https://dev.d2c7oi8mimsn0e.amplifyapp.com",
   optionsSuccessStatus: 200,
@@ -30,7 +31,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());

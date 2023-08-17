@@ -66,8 +66,8 @@ const authController = async (req, res) => {
   const result = await findUser.save();
 
  res.cookie("jwt", refreshToken, {
-  // httpOnly: true, 
-  // secure: true, 
+  httpOnly: true, 
+  secure: false, 
   sameSite: 'none', 
   maxAge: 7 * 24 * 60 * 60 * 1000, 
 });
