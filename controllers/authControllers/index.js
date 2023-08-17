@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv");
 const { generateJwtToken } = require("../../utils/jwtHelper");
 const asyncHandler = require("../../middleware/async");
+const CryptoJS=require('crypto-js')
 dotenv.config();
 
 const signupController = async (req, res) => {
@@ -34,7 +35,19 @@ const signupController = async (req, res) => {
 };
 
 const authController = async (req, res) => {
-  let { username, password } = req.body;
+
+  const encryptedData = req.body.encryptedData;
+  console.log({encryptedData});
+  const ENCRYPT_SECRET=process.env.ENCRYPT_SECRET
+  // Decrypt the encrypted data using the same secret key and IV
+  const bytes = CryptoJS.AES.decrypt(encryptedData, ENCRYPT_SECRET);
+  const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+
+  const userData = JSON.parse(decryptedData);
+  const { username, password } = userData;
+  // let { username, password } = req.body;
+  console.log({username});
+  console.log({password});
   try {
     if (!username || !password) {
       return res.status(400).json({ error: "All input fields are required" });
