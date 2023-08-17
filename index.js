@@ -11,7 +11,7 @@ dotenv.config();
 
 const app = express();
 const corsOptions = {
-  origin: "https://dev.d2c7oi8mimsn0e.amplifyapp.com",
+  origin: "http://localhost:3000",
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
