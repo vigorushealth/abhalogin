@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const helmet = require("helmet");
 const dotenv = require("dotenv");
-const csrf = require("csurf");
+// const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
 const { MongoConnection } = require("./databases");
 const router = require("./routes");
@@ -17,7 +17,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-const csrfProtection = csrf({ cookie: true });
+// const csrfProtection = csrf({ cookie: true });
 app.use(helmet())
 app.use((req, res, next) => {
   if (req.secure) {
