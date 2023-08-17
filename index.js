@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 const corsOptions = {
   origin: "https://dev.d2c7oi8mimsn0e.amplifyapp.com",
-
+  optionsSuccessStatus: 200,
   credentials: true
 };
 
