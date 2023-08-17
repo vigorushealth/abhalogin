@@ -70,6 +70,7 @@ const authController = async (req, res) => {
   secure: true, 
   sameSite: "Strict", 
   maxAge: 7 * 24 * 60 * 60 * 1000, 
+  domain:"dev.d2c7oi8mimsn0e.amplifyapp.com"
 });
     res.status(200).json({
       token,
