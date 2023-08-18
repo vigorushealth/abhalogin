@@ -14,7 +14,8 @@ app.use(cookieParser());
 const corsOptions = {
   origin: "https://dev.d2c7oi8mimsn0e.amplifyapp.com",
   optionsSuccessStatus: 200,
-  credentials: true
+  credentials: true,
+  methods: ['GET','POST']
 };
 
 app.use(cors(corsOptions));

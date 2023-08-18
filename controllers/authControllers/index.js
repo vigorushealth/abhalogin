@@ -135,7 +135,7 @@ const refresh=async(req,res,next)=>{
       }).exec();
 
       if (!foundUser) return res.status(401).json({ message: "Unauthorized" });
-
+     else{
       const token = jwt.sign(
         {
           UserInfo: {
@@ -147,6 +147,7 @@ const refresh=async(req,res,next)=>{
       );
 
       res.json({ token });
+     }
     })
   ); 
 }
