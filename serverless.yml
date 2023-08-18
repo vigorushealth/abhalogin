@@ -7,6 +7,7 @@ provider:
   region: ap-south-1
 plugins:
   - serverless-offline
+  - serverless-plugin-common-excludes
 functions:
   hello:
     handler: handler.hello
