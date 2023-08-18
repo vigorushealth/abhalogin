@@ -10,7 +10,7 @@ const userSchema= new mongoose.Schema({
         required:true,
         // min:6
     },
-     refreshToken: String,
+     refreshToken: [String],
     role:{
         type:String,
         required:true

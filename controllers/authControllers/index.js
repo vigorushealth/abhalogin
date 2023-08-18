@@ -35,7 +35,7 @@ const signupController = async (req, res) => {
 };
 
 const authController = async (req, res) => {
-
+const cookies=req.cookies;
   const encryptedData = req.body.encryptedData;
   console.log({encryptedData});
   const ENCRYPT_SECRET=process.env.ENCRYPT_SECRET
@@ -46,8 +46,8 @@ const authController = async (req, res) => {
   const userData = JSON.parse(decryptedData);
   const { username, password } = userData;
   // let { username, password } = req.body;
-  console.log({username});
-  console.log({password});
+  // // console.log({username});
+  // // console.log({password});
   try {
     if (!username || !password) {
       return res.status(400).json({ error: "All input fields are required" });
@@ -75,9 +75,25 @@ const authController = async (req, res) => {
   process.env.REFRESH_TOKEN_SECRET,
   { expiresIn: "1d" }
 );
-  findUser.refreshToken=refreshToken;
-  const result = await findUser.save();
+let newRefreshTokenArray =
+!cookies?.jwt
+    ? findUser.refreshToken
+    : findUser.refreshToken.filter(rt => rt !== cookies.jwt);
+    if (cookies?.jwt) {
+      const refreshToken = cookies.jwt;
+      const foundToken = await User.findOne({ refreshToken }).exec();
+      if (!foundToken) {
+          console.log('attempted refresh token reuse at login!')
+          newRefreshTokenArray = [];
+      }
 
+      res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+  }
+
+  // findUser.refreshToken=refreshToken;
+  findUser.refreshToken = [...newRefreshTokenArray, refreshToken];
+  const result = await findUser.save();
+console.log({result});
  res.cookie("jwt", refreshToken, {
   httpOnly: true, 
   secure: true, 
@@ -104,11 +120,37 @@ const refresh=async(req,res,next)=>{
   if(!cookies?.jwt){
     return res.status(401).send({message:"Unauthorized"})
   }
+  
   const refreshToken=cookies.jwt;
+  res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+  const foundUser = await User.findOne({ refreshToken }).exec();
+
+  // Detected refresh token reuse!
+  if (!foundUser) {
+      jwt.verify(
+          refreshToken,
+          process.env.REFRESH_TOKEN_SECRET,
+          async (err, decoded) => {
+              if (err) return res.sendStatus(403); //Forbidden
+              console.log('attempted refresh token reuse!')
+              const hackedUser = await User.findOne({ username: decoded.username }).exec();
+              hackedUser.refreshToken = [];
+              const result = await hackedUser.save();
+              console.log(result);
+          }
+      )
+      return res.sendStatus(403); //Forbidden
+  }
+  const newRefreshTokenArray = foundUser.refreshToken.filter(rt => rt !== refreshToken);
   jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET,
     asyncHandler(async (err, decoded) => {
-      if (err) return res.status(403).json({ message: "Forbidden" });
-
+      if (err){
+        foundUser.refreshToken = [...newRefreshTokenArray];
+        const result = await foundUser.save();
+        console.log(result);
+        
+      }
+      if (err ) return res.sendStatus(403);
       const foundUser = await User.findOne({
         username: decoded.username,
       }).exec();
@@ -122,6 +164,17 @@ const refresh=async(req,res,next)=>{
         payload,
          "15m" 
       );
+      const newRefreshToken = jwt.sign(
+        { "username": foundUser.username },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: '1d' }
+    );
+    // Saving refreshToken with current user
+    foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+    const result2 = await foundUser.save();
+   console.log({result2});
+    // Creates Secure Cookie with refresh token
+    res.cookie('jwt', newRefreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
 
       res.json({ token });
     }))
