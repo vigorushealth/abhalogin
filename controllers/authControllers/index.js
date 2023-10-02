@@ -69,7 +69,7 @@ const authController = async (req, res) => {
       role: findUser.role,
     };
   
-    const token = generateJwtToken(payload, '2m');
+    const token = generateJwtToken(payload, '1d');
   
     const refreshToken = jwt.sign(
       { username: findUser.username },
